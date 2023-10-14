@@ -48,16 +48,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http.csrf().disable().authorizeRequests((rq) -> {
-                    rq.antMatchers("/admin/**").access("hasRole('ROLE_ADMIN')");
-                    rq.antMatchers("/**").access("hasRole('ROLE_USER')");
                     rq.antMatchers("/**").permitAll();
                     rq.anyRequest().authenticated();
                 })
                 .formLogin()
-                .loginProcessingUrl("/signup")
+                .loginProcessingUrl("/doLogin")
                 .loginPage("/login")
-                .defaultSuccessUrl("/?login_success")
-                .successHandler(new SuccessHandler()).failureUrl("/login?error=true")
+                .defaultSuccessUrl("/")
                 .failureUrl("/login?error=true")
                 .permitAll()
                 .and()

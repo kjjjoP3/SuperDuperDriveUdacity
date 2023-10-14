@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.User;
-import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.repository.UserRepository;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.mapper.UserMapper;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.UserService;
 
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.List;
 public class RegisterController {
 
     @Autowired
-    UserRepository userRepository;
+    UserMapper userRepository;
 
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -41,13 +41,14 @@ public class RegisterController {
                            RedirectAttributes redirAtt,
                            @RequestParam("password") String password) {
         if (result.hasErrors()) {
+            model.addAttribute("error", "Example Signup Error Message");
             return "signup";
         }
         if (!checkEmail(dto.getEmail())) {
-            model.addAttribute("error", "Email này đã được sử dụng!");
+            model.addAttribute("error", "E-mail is being used!");
             return "signup";
         } else {
-            redirAtt.addFlashAttribute("message", "Đăng kí thành công");
+            redirAtt.addFlashAttribute("message", "You successfully signed up! Please continue to the login page.");
             userService.registerUser(dto, password);
         }
 

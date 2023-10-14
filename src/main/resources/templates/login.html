@@ -11,16 +11,14 @@
 <body class="p-3 mb-2 bg-light text-black">
 <div class="container justify-content-center w-25 p-3" style="background-color: #eeeeee; margin-top: 5em;">
     <h1 class="display-5">Login</h1>
-    <form action="#" method="POST">
-        <div class="alert alert-danger">
-            Invalid username or password
-        </div>
-        <div class="alert alert-dark">
-            You have been logged out
+    <form th:action="@{/doLogin}"  method="POST">
+        <!-- error message -->
+        <div th:if="${param.error}">
+            <div class="alert alert-danger"><span>Invalid username or password!</span></div>
         </div>
         <div class="form-group">
-            <label for="inputUsername">Username</label>
-            <input type="input" class="form-control" name="username" id="inputUsername" placeholder="Enter Username" maxlength="20" required>
+            <label for="inputEmail">Email</label>
+            <input type="email" class="form-control" name="username" id="inputEmail" placeholder="Enter Email" required>
         </div>
         <div class="form-group">
             <label for="inputPassword">Password</label>

@@ -7,14 +7,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.User;
-import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.repository.UserRepository;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.mapper.UserMapper;
 
 import java.security.Principal;
 
 @Controller
 public class HomeController {
     @Autowired
-    UserRepository userRepository;
+    UserMapper userRepository;
 
     @ModelAttribute(value = "user")
     public User user(Model model, Principal principal, User user) {

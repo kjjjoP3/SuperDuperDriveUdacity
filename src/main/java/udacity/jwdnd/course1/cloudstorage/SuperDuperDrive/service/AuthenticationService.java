@@ -19,8 +19,9 @@ import java.util.ArrayList;
 public class AuthenticationService implements AuthenticationProvider {
     @Autowired
     private UserMapper userMapper;
+
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    HashService hashService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -32,11 +33,14 @@ public class AuthenticationService implements AuthenticationProvider {
             throw new UsernameNotFoundException("User not found");
         }
 
-        if (bCryptPasswordEncoder.matches(password, user.getPassword())) {
-            return new UsernamePasswordAuthenticationToken(username, password, new ArrayList<>());
-        } else {
-            throw new BadCredentialsException("Invalid password");
+        if (user != null){
+            String encodeSalt = user.getSalt();
+            String hashedPassword = hashService.getHashedValue(password, encodeSalt);
+            if (user.getPassword().equals(hashedPassword)) {
+                return new UsernamePasswordAuthenticationToken(username, password, new ArrayList<>());
+            }
         }
+        return null;
     }
 
     @Override
@@ -46,7 +50,13 @@ public class AuthenticationService implements AuthenticationProvider {
 
     public Integer getUserId(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userMapper.getUser(authentication.getName());
-        return user.getUserId();
+        if (authentication != null) {
+            String username = authentication.getName();
+            User user = userMapper.getUser(username);
+            if (user != null) {
+                return user.getUserId();
+            }
+        }
+        return null;
     }
 }

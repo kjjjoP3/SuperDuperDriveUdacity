@@ -1,16 +1,16 @@
 package udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class LoginController {
-    @Autowired
-
-    @GetMapping(value = "/login")
-    public String login() {
-        return "login";
+    @GetMapping("/login")
+    public ModelAndView login(ModelMap model) {
+        model.addAttribute("error", false);
+        model.addAttribute("logout", false);
+        return new ModelAndView("login");
     }
-
 }

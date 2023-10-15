@@ -2,61 +2,72 @@ package udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.mapper.UserMapper;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.Credential;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.Note;
-import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.User;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.AuthenticationService;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.CredentialService;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.FileService;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.NoteService;
-import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.UserService;
-
-import java.security.Principal;
 
 @Controller
+@RequestMapping("/note")
 public class NoteController {
 
     @Autowired
-    NoteService noteService;
+    NoteService noteservice;
 
     @Autowired
-    private UserService userService;
+    FileService fileservice;
 
     @Autowired
-    private UserMapper userRepository;
+    AuthenticationService authenticationservice;
 
-    @ModelAttribute(value = "user")
-    public User user(Model model, Principal principal, User user) {
+    @Autowired
+    CredentialService credentialservice;
 
-        if (principal != null) {
-            model.addAttribute("user", new User());
-            user = userRepository.findByEmail(principal.getName());
-            model.addAttribute("user", user);
-        }
+    @PostMapping("/addOrUpdate")
+    public ModelAndView createNote(@ModelAttribute("note") Note note, ModelMap model) {
+        int userId = authenticationservice.getUserId();
+        note.setUserId(userId);
 
-        return user;
-    }
-
-    @PostMapping("/addOrUpdateNote")
-    public String addOrUpdateNote(@ModelAttribute Note note, ModelMap model) {
-        User currentUser = userService.getCurrentUser();
-        int userId = Math.toIntExact(currentUser.getUserId());
-        if (note.getNoteId() != null) {
-            noteService.saveNoteToDo(note);
-            model.addAttribute("message", "Update note success!");
+        if (note.getNoteId() == null || note.getNoteId().toString().equals("")) {
+            if (noteservice.createNote(note) == 1) {
+                model.addAttribute("message", "Add note success!");
+            } else {
+                model.addAttribute("error", "Add note fail!");
+            }
         } else {
-            note.setUser(currentUser);
-            noteService.updateNoteToDo(note);
-            model.addAttribute("message", "Add note success!");
+            if (noteservice.updateNote(note) == 1) {
+                model.addAttribute("message", "Update note success!");
+            } else {
+                model.addAttribute("error", "Update note fail!");
+            }
         }
         loadAllNote(model, userId);
-        return "redirect:/";
+        return new ModelAndView("home");
+    }
+
+    @GetMapping("/delete/{noteId}")
+    public ModelAndView deleteNote(@PathVariable int noteId, ModelMap model) {
+        int userId = authenticationservice.getUserId();
+        if(noteservice.deleteNote(noteId)==1) {
+            model.addAttribute("message", "Delete note success!");
+        } else {
+            model.addAttribute("error", "Delete note fail!");
+        }
+
+        loadAllNote(model, userId);
+        return new ModelAndView("home");
     }
 
     void loadAllNote(ModelMap model, int userId) {
-        model.addAttribute("listNote", noteService.getListNoteToDoByUserId(userId));
+        model.addAttribute("fileList", fileservice.getListFileByUserId(userId));
+        model.addAttribute("listNote", noteservice.getListNoteByUserId(userId));
         model.addAttribute("note", new Note());
+        model.addAttribute("listCredential", credentialservice.getCredentialsListByUserId(userId));
+        model.addAttribute("credential", new Credential());
     }
-
 }

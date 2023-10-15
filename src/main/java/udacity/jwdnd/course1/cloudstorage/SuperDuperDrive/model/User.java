@@ -1,35 +1,24 @@
 package udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model;
-import lombok.AllArgsConstructor;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Collection;
-
-@SuppressWarnings("serial")
-@Data
-@Entity
-@Table(name = "user", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
-public class User implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class User {
     private Integer userId;
+    private String username;
+    private String password;
     private String firstName;
     private String lastName;
-    private String email;
-    private String password;
+    private String salt;
 
-    public User() {
-    }
-
-    public User(Integer userId, String firstName, String lastName, String email, String password) {
+    public User(Integer userId, String username, String password, String firstName, String lastName, String salt) {
+        super();
         this.userId = userId;
+        this.username = username;
+        this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.email = email;
-        this.password = password;
+        this.salt = salt;
+    }
+
+    public User() {
     }
 
     public Integer getUserId() {
@@ -38,6 +27,22 @@ public class User implements Serializable {
 
     public void setUserId(Integer userId) {
         this.userId = userId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getFirstName() {
@@ -56,19 +61,13 @@ public class User implements Serializable {
         this.lastName = lastName;
     }
 
-    public String getEmail() {
-        return email;
+    public String getSalt() {
+        return salt;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }
+

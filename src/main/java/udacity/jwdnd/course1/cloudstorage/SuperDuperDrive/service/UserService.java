@@ -1,17 +1,34 @@
 package udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.mapper.UserMapper;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.User;
 
-import java.util.List;
+import java.security.SecureRandom;
+import java.util.Base64;
 
-public interface UserService {
-    void registerUser(User user, String password);
+@Service
+public class UserService {
+    @Autowired
+    HashService hashservice;
+    @Autowired
+    UserMapper usermapper;
 
-    User getCurrentUser();
+    //	@Autowired
+//    AuthenticationService authenticationservice;
+    SecureRandom ramdom = new SecureRandom();
 
-    User findByEmail(String email);
+    public int RegisterUser(User user){
+        byte[] salt = new byte[16];
+        ramdom.nextBytes(salt);
+        String encodeSalt = Base64.getEncoder().encodeToString(salt);
+        String hashedPassword = hashservice.getHashedValue(user.getPassword(), encodeSalt);
+        return usermapper.insert(new User(null, user.getUsername(), hashedPassword, user.getFirstName(), user.getLastName(), encodeSalt));
+    }
 
-    void deleteUserById(Long id);
-
-    List<User> getAllUsers();
+    public User getUser(String username){
+        return usermapper.getUser(username);
+    }
 }
+

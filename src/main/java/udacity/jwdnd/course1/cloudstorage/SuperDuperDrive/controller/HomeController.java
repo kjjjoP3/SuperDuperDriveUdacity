@@ -1,44 +1,52 @@
 package udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.controller;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.Credential;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.File;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.Note;
-import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.User;
-import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.mapper.UserMapper;
-import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.Iml.UserDetailService;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.AuthenticationService;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.CredentialService;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.FileService;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.NoteService;
-import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.UserService;
 
-import java.security.Principal;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Controller
 public class HomeController {
-    @Autowired
-    UserMapper userRepository;
 
     @Autowired
-    NoteService noteService;
+    FileService fileservice;
 
     @Autowired
-    UserDetailService userDetailService;
+    AuthenticationService authenticationservice;
 
-    @GetMapping(value = "/")
-    public String home(Model model, Principal principal) {
-        if (principal == null) {
-            return "redirect:/login";
-        }
+    @Autowired
+    NoteService noteservice;
 
-        int userId = userDetailService.getUserId();
+    @Autowired
+    CredentialService credentialservice;
 
-        List<Note> listNote = noteService.getListNoteToDoByUserId(userId);
+    @RequestMapping(value = {"/home", "/"})
+    public ModelAndView home(ModelMap model, HttpSession httpSession) {
+
+        int userId = authenticationservice.getUserId();
+
+        List<File> listFile = fileservice.getListFileByUserId(userId);
+        model.addAttribute("fileList", listFile);
+
+        List<Note> listNote = noteservice.getListNoteByUserId(userId);
         model.addAttribute("listNote", listNote);
-
         model.addAttribute("note", new Note());
-        return "home";
+
+        List<Credential> listCredential = credentialservice.getCredentialsListByUserId(userId);
+        model.addAttribute("listCredential", listCredential);
+        model.addAttribute("credential", new Credential());
+
+        return new ModelAndView("home", model);
     }
 }

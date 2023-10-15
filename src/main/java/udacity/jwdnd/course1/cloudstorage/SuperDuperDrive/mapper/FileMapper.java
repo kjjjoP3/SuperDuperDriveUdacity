@@ -11,16 +11,16 @@ public interface FileMapper {
     @Options(useGeneratedKeys = true, keyProperty = "fileId")
     int createFile(File file);
 
-    @Select("Select * From FILES Where fileName = #{fileName} And userId = #{userId}")
+    @Select("SELECT * From FILES WHERE fileName = #{fileName} And userId = #{userId}")
     File checkExistFileName(String fileName, int userId);
 
-    @Select("Select * From FILES Where userId = #{userId}")
+    @Select("SELECT * From FILES WHERE userId = #{userId}")
     List<File> getFileListByUserId(int userId);
 
-    @Select("Select * From FILES Where fileId = #{fileId}")
+    @Select("SELECT * From FILES WHERE fileId = #{fileId}")
     File getFileById(int fileId);
 
-    @Delete("Delete FILES Where fileId = #{fileId}")
+    @Delete("DELETE FILES WHERE fileId = #{fileId}")
     int deleteFileById(int fileId);
 
 }

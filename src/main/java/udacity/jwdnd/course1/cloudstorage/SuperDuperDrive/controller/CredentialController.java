@@ -1,13 +1,16 @@
 package udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.Credential;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.Note;
-import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.*;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.AuthenticationService;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.Iml.CredentialServiceImpl;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.Iml.FileServiceImpl;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.Iml.NoteServiceImpl;
 
 import java.util.List;
 
@@ -15,22 +18,19 @@ import java.util.List;
 @RequestMapping("/credential")
 public class CredentialController {
     @Autowired
-    CredentialService credentialservice;
+    CredentialServiceImpl credentialservice;
 
     @Autowired
     AuthenticationService authenticationservice;
 
     @Autowired
-    NoteService noteservice;
+    NoteServiceImpl noteservice;
 
     @Autowired
-    FileService fileservice;
-
-    @Autowired
-    EncryptionService encryptionService;
+    FileServiceImpl fileservice;
 
     @PostMapping("/add")
-    public ModelAndView addAndUpdateCredential(@ModelAttribute("credential") Credential credential, ModelMap model) {
+    public String addAndUpdateCredential(@ModelAttribute("credential") Credential credential, ModelMap model) {
         credential.setUserId(authenticationservice.getUserId());
         if (credential.getCredentialId() == null || credential.getCredentialId().toString().equals("")) {
             if (credentialservice.insertCredential(credential) == 1) {
@@ -40,37 +40,40 @@ public class CredentialController {
             }
         } else {
             if (credentialservice.updateCredential(credential) == 1) {
-                model.addAttribute("message", "Insert credential success!");
+                model.addAttribute("message", "Update credential success!");
             } else {
-                model.addAttribute("error", "Insert credential fail!");
+                model.addAttribute("error", "Update credential fail!");
             }
         }
-        loadAllInfomation(model, authenticationservice.getUserId());
-        return new ModelAndView("home");
+        loadAllInformation(model, authenticationservice.getUserId());
+        return "home";
     }
 
+
     @GetMapping("/delete/{credentialId}")
-    public ModelAndView deleteCredential(@PathVariable int credentialId, ModelMap model) {
+    public String deleteCredential(@PathVariable int credentialId, ModelMap model) {
         if (credentialservice.deleteCredential(credentialId) == 1) {
             model.addAttribute("message", "Delete credential success!!");
         } else {
             model.addAttribute("error", "Delete credential fail!!");
         }
-
-        loadAllInfomation(model, authenticationservice.getUserId());
-
-        return new ModelAndView("home");
+        loadAllInformation(model, authenticationservice.getUserId());
+        return "home";
     }
 
-    void loadAllInfomation(ModelMap model, int userId) {
+
+    void loadAllInformation(ModelMap model, int userId) {
         model.addAttribute("fileList", fileservice.getListFileByUserId(userId));
         model.addAttribute("listNote", noteservice.getListNoteByUserId(userId));
         model.addAttribute("note", new Note());
         List<Credential> listCredentials = credentialservice.getCredentialsListByUserId(userId);
-        for(Credential x: listCredentials) {
-            x.setPasswordUnCredential(encryptionService.decryptValue(x.getPassword(), x.getKey()));
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        for (Credential credential : listCredentials) {
+            String decryptedPassword = passwordEncoder.encode(credential.getPassword() + credential.getKey());
+            credential.setPasswordUnCredential(decryptedPassword);
         }
         model.addAttribute("listCredential", listCredentials);
-        model.addAttribute("credential",  new Credential());
+        model.addAttribute("credential", new Credential());
     }
+
 }

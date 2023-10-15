@@ -2,19 +2,16 @@ package udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.Credential;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.File;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.Note;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.AuthenticationService;
-import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.CredentialService;
-import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.FileService;
-import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.NoteService;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.Iml.CredentialServiceImpl;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.Iml.FileServiceImpl;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.Iml.NoteServiceImpl;
 
-import javax.servlet.http.HttpSession;
 import java.security.Principal;
 import java.util.List;
 
@@ -22,37 +19,36 @@ import java.util.List;
 public class HomeController {
 
     @Autowired
-    FileService fileservice;
+    FileServiceImpl fileService;
 
     @Autowired
-    AuthenticationService authenticationservice;
+    AuthenticationService authenticationService;
 
     @Autowired
-    NoteService noteservice;
+    NoteServiceImpl noteService;
 
     @Autowired
-    CredentialService credentialservice;
+    CredentialServiceImpl credentialService;
 
-    @RequestMapping(value = {"/home", "/"}, method = RequestMethod.GET)
-    public ModelAndView home(ModelMap model, HttpSession httpSession, Principal principal) {
-
+    @GetMapping(value = {"/home", "/"})
+    public String home(Model model, Principal principal) {
         if (principal == null) {
-            return new ModelAndView( "redirect:/login");
+            return "redirect:/login";
         }
 
-        int userId = authenticationservice.getUserId();
+        int userId = authenticationService.getUserId();
 
-        List<File> listFile = fileservice.getListFileByUserId(userId);
+        List<File> listFile = fileService.getListFileByUserId(userId);
+        List<Note> listNote = noteService.getListNoteByUserId(userId);
+        List<Credential> listCredential = credentialService.getCredentialsListByUserId(userId);
+
         model.addAttribute("fileList", listFile);
-
-        List<Note> listNote = noteservice.getListNoteByUserId(userId);
         model.addAttribute("listNote", listNote);
         model.addAttribute("note", new Note());
-
-        List<Credential> listCredential = credentialservice.getCredentialsListByUserId(userId);
         model.addAttribute("listCredential", listCredential);
         model.addAttribute("credential", new Credential());
 
-        return new ModelAndView("home", model);
+        return "home";
     }
+
 }

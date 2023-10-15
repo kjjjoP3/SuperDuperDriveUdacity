@@ -8,28 +8,33 @@ import org.springframework.web.servlet.ModelAndView;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.Credential;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.Note;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.AuthenticationService;
-import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.CredentialService;
-import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.FileService;
-import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.NoteService;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.Iml.CredentialServiceImpl;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.Iml.FileServiceImpl;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.Iml.NoteServiceImpl;
+
+import java.security.Principal;
 
 @Controller
-@RequestMapping("/note")
 public class NoteController {
 
     @Autowired
-    NoteService noteservice;
+    NoteServiceImpl noteservice;
 
     @Autowired
-    FileService fileservice;
+    FileServiceImpl fileservice;
 
     @Autowired
     AuthenticationService authenticationservice;
 
     @Autowired
-    CredentialService credentialservice;
+    CredentialServiceImpl credentialservice;
 
-    @PostMapping("/addOrUpdate")
-    public ModelAndView createNote(@ModelAttribute("note") Note note, ModelMap model) {
+    @PostMapping("/note/addOrUpdate")
+    public String createNote(@ModelAttribute("note") Note note, ModelMap model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/login";
+        }
+
         int userId = authenticationservice.getUserId();
         note.setUserId(userId);
 
@@ -46,28 +51,35 @@ public class NoteController {
                 model.addAttribute("error", "Update note fail!");
             }
         }
-        loadAllNote(model, userId);
-        return new ModelAndView("home");
+        loadAllInformation(model, principal);
+        return "home";
     }
 
-    @GetMapping("/delete/{noteId}")
-    public ModelAndView deleteNote(@PathVariable int noteId, ModelMap model) {
+    @GetMapping("/note/delete/{noteId}")
+    public String deleteNote(@PathVariable int noteId, ModelMap model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/login";
+        }
+
         int userId = authenticationservice.getUserId();
-        if(noteservice.deleteNote(noteId)==1) {
+        if (noteservice.deleteNote(noteId) == 1) {
             model.addAttribute("message", "Delete note success!");
         } else {
             model.addAttribute("error", "Delete note fail!");
         }
 
-        loadAllNote(model, userId);
-        return new ModelAndView("home");
+        loadAllInformation(model, principal);
+        return "home";
     }
 
-    void loadAllNote(ModelMap model, int userId) {
-        model.addAttribute("fileList", fileservice.getListFileByUserId(userId));
-        model.addAttribute("listNote", noteservice.getListNoteByUserId(userId));
-        model.addAttribute("note", new Note());
-        model.addAttribute("listCredential", credentialservice.getCredentialsListByUserId(userId));
-        model.addAttribute("credential", new Credential());
+    void loadAllInformation(ModelMap model, Principal principal) {
+        if (principal != null) {
+            int userId = authenticationservice.getUserId();
+            model.addAttribute("fileList", fileservice.getListFileByUserId(userId));
+            model.addAttribute("listNote", noteservice.getListNoteByUserId(userId));
+            model.addAttribute("note", new Note());
+            model.addAttribute("listCredential", credentialservice.getCredentialsListByUserId(userId));
+            model.addAttribute("credential", new Credential());
+        }
     }
 }

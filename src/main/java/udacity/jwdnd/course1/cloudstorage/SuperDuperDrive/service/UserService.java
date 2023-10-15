@@ -6,6 +6,9 @@ import java.util.List;
 
 public interface UserService {
     void registerUser(User user, String password);
+
+    User getCurrentUser();
+
     User findByEmail(String email);
 
     void deleteUserById(Long id);

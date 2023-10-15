@@ -11,7 +11,7 @@ import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.Authentication
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     AuthenticationService authenticationService;
 
@@ -22,10 +22,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().antMatchers("/signup", "/css/**", "/js/").permitAll().anyRequest().authenticated();
-        http.formLogin().loginPage("/login").permitAll();
-        http.formLogin().defaultSuccessUrl("/home", true);
-        http.logout().logoutRequestMatcher(new AntPathRequestMatcher("/logout")).logoutSuccessUrl("/login?logout");
-
+        http
+                .authorizeRequests()
+                .antMatchers("/**").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .formLogin()
+                .loginPage("/login")
+                .permitAll()
+                .defaultSuccessUrl("/home", true)
+                .and()
+                .logout()
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                .logoutSuccessUrl("/login?logout");
     }
 }

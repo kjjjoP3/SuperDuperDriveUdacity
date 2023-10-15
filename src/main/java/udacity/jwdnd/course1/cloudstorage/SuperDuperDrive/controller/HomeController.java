@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.Credential;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.File;
@@ -14,6 +15,7 @@ import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.FileService;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.NoteService;
 
 import javax.servlet.http.HttpSession;
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -31,8 +33,12 @@ public class HomeController {
     @Autowired
     CredentialService credentialservice;
 
-    @RequestMapping(value = {"/home", "/"})
-    public ModelAndView home(ModelMap model, HttpSession httpSession) {
+    @RequestMapping(value = {"/home", "/"}, method = RequestMethod.GET)
+    public ModelAndView home(ModelMap model, HttpSession httpSession, Principal principal) {
+
+        if (principal == null) {
+            return new ModelAndView( "redirect:/login");
+        }
 
         int userId = authenticationservice.getUserId();
 

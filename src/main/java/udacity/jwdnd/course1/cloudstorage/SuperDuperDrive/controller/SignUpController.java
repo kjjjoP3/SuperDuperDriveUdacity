@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.User;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.Iml.UserServiceImpl;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.UserService;
 
 import java.security.Principal;
 
@@ -15,7 +16,7 @@ import java.security.Principal;
 public class SignUpController {
 
     @Autowired
-    UserServiceImpl userservice;
+    UserService userService;
 
     @GetMapping("/signup")
     public String signUp(Model model) {
@@ -27,24 +28,22 @@ public class SignUpController {
     @PostMapping("/signup")
     public String register(@ModelAttribute User user, Model model, Principal principal) {
         if (principal != null) {
+            // Người dùng đã đăng nhập, chuyển họ đến trang chính.
             return "redirect:/home";
         }
 
-        boolean check = true;
-        if (userservice.getUser(user.getUsername()) != null) {
-            check = false;
+        boolean registrationSuccessful = userService.registerUser(user);
+
+        if (registrationSuccessful) {
+            // Đăng ký thành công, chuyển họ đến trang đăng nhập.
+            model.addAttribute("signupSuccess", true);
+            return "login";
         } else {
-            if (userservice.RegisterUser(user) <= 0) {
-                check = false;
-            }
-        }
-        if (!check) {
-            model.addAttribute("error", true);
-            model.addAttribute("done", false);
+            // Đăng ký thất bại, hiển thị thông báo lỗi.
+            model.addAttribute("signupError", "Username is already taken.");
             return "signup";
         }
-        model.addAttribute("signupSuccess", true);
-        return "login";
     }
+
 }
 

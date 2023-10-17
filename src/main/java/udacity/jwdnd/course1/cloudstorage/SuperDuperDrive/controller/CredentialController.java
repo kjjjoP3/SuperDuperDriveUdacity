@@ -6,11 +6,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.Credential;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.Note;
-import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.AuthenticationService;
-import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.EncryptionService;
-import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.Iml.CredentialServiceImpl;
-import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.Iml.FileServiceImpl;
-import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.Iml.NoteServiceImpl;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.*;
 
 import java.util.List;
 
@@ -18,16 +14,16 @@ import java.util.List;
 @RequestMapping("/credential")
 public class CredentialController {
     @Autowired
-    CredentialServiceImpl credentialService;
+    CredentialService credentialService;
 
     @Autowired
     AuthenticationService authenticationService;
 
     @Autowired
-    NoteServiceImpl noteService;
+    NoteService noteService;
 
     @Autowired
-    FileServiceImpl fileService;
+    FileService fileService;
 
     @Autowired
     EncryptionService encryptionService;

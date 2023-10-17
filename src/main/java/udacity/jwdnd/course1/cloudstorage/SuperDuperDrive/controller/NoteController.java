@@ -8,9 +8,12 @@ import org.springframework.web.servlet.ModelAndView;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.Credential;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.Note;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.AuthenticationService;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.CredentialService;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.FileService;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.Iml.CredentialServiceImpl;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.Iml.FileServiceImpl;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.Iml.NoteServiceImpl;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.NoteService;
 
 import java.security.Principal;
 
@@ -18,19 +21,19 @@ import java.security.Principal;
 public class NoteController {
 
     @Autowired
-    NoteServiceImpl noteservice;
+    NoteService noteService;
 
     @Autowired
-    FileServiceImpl fileservice;
+    FileService fileService;
+
+    @Autowired
+    CredentialService credentialService;
 
     @Autowired
     AuthenticationService authenticationservice;
 
-    @Autowired
-    CredentialServiceImpl credentialservice;
-
     @PostMapping("/note/addOrUpdate")
-    public String createNote(@ModelAttribute("note") Note note, ModelMap model, Principal principal) {
+    public String createOrUpdateNote(@ModelAttribute Note note, ModelMap model, Principal principal) {
         if (principal == null) {
             return "redirect:/login";
         }
@@ -38,14 +41,14 @@ public class NoteController {
         int userId = authenticationservice.getUserId();
         note.setUserId(userId);
 
-        if (note.getNoteId() == null || note.getNoteId().toString().equals("")) {
-            if (noteservice.createNote(note) == 1) {
+        if (note.getNoteId() == null) {
+            if (noteService.createNote(note) == 1) {
                 model.addAttribute("message", "Add note success!");
             } else {
                 model.addAttribute("error", "Add note fail!");
             }
         } else {
-            if (noteservice.updateNote(note) == 1) {
+            if (noteService.updateNote(note) == 1) {
                 model.addAttribute("message", "Update note success!");
             } else {
                 model.addAttribute("error", "Update note fail!");
@@ -61,13 +64,11 @@ public class NoteController {
             return "redirect:/login";
         }
 
-        int userId = authenticationservice.getUserId();
-        if (noteservice.deleteNote(noteId) == 1) {
+        if (noteService.deleteNote(noteId) == 1) {
             model.addAttribute("message", "Delete note success!");
         } else {
             model.addAttribute("error", "Delete note fail!");
         }
-
         loadAllInformation(model, principal);
         return "home";
     }
@@ -75,10 +76,10 @@ public class NoteController {
     void loadAllInformation(ModelMap model, Principal principal) {
         if (principal != null) {
             int userId = authenticationservice.getUserId();
-            model.addAttribute("fileList", fileservice.getListFileByUserId(userId));
-            model.addAttribute("listNote", noteservice.getListNoteByUserId(userId));
+            model.addAttribute("fileList", fileService.getListFileByUserId(userId));
+            model.addAttribute("listNote", noteService.getListNoteByUserId(userId));
             model.addAttribute("note", new Note());
-            model.addAttribute("listCredential", credentialservice.getCredentialsListByUserId(userId));
+            model.addAttribute("listCredential", credentialService.getCredentialsListByUserId(userId));
             model.addAttribute("credential", new Credential());
         }
     }

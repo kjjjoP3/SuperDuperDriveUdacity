@@ -28,7 +28,7 @@ public class CredentialServiceImpl implements CredentialService {
     @Override
     public int insertCredential(Credential credential) {
         setEncryptedValues(credential);
-        return credentialMapper.insertCredential(credential);
+        return credentialMapper.addCredential(credential);
     }
 
     @Override

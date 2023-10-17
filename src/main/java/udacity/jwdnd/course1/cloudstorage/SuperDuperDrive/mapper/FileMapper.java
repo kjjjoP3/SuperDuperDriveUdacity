@@ -7,20 +7,20 @@ import java.util.List;
 
 @Mapper
 public interface FileMapper {
-    @Insert("Insert into FILES(filename, contenttype, filesize, userid, filedata) Values(#{fileName}, #{contentType}, #{fileSize}, #{userId}, #{fileData})")
+    @Insert("INSERT INTO FILES (fileName, contentType, fileSize, userId, fileData) VALUES (#{fileName}, #{contentType}, #{fileSize}, #{userId}, #{fileData})")
     @Options(useGeneratedKeys = true, keyProperty = "fileId")
-    int createFile(File file);
+    int addFile(File file);
 
-    @Select("SELECT * From FILES WHERE fileName = #{fileName} And userId = #{userId}")
+    @Select("SELECT * FROM FILES WHERE fileName = #{fileName} AND userId = #{userId}")
     File checkExistFileName(String fileName, int userId);
 
-    @Select("SELECT * From FILES WHERE userId = #{userId}")
+    @Select("SELECT * FROM FILES WHERE userId = #{userId}")
     List<File> getFileListByUserId(int userId);
 
-    @Select("SELECT * From FILES WHERE fileId = #{fileId}")
+    @Select("SELECT * FROM FILES WHERE fileId = #{fileId}")
     File getFileById(int fileId);
 
-    @Delete("DELETE FILES WHERE fileId = #{fileId}")
+    @Delete("DELETE FROM FILES WHERE fileId = #{fileId}")
     int deleteFileById(int fileId);
-
 }
+

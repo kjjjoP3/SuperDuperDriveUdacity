@@ -13,15 +13,27 @@ import java.util.Base64;
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
-    UserMapper userMapper;
+    private UserMapper userMapper;
     @Autowired
-    HashService hashService;
+    private HashService hashService;
 
     @Override
-    public int RegisterUser(User user){
-        String encodeSalt = generateRandomSalt();
-        String hashedPassword = hashService.getHashedValue(user.getPassword(), encodeSalt);
-        return userMapper.insert(new User(null, user.getUsername(), hashedPassword, user.getFirstName(), user.getLastName(), encodeSalt));
+    public boolean registerUser(User user) {
+        if (getUser(user.getUsername()) != null) {
+            return false;
+        }
+
+        String encodedSalt = generateRandomSalt();
+        String hashedPassword = hashService.getHashedValue(user.getPassword(), encodedSalt);
+
+        int rowsInserted = userMapper.save(new User(null, user.getUsername(), hashedPassword, user.getFirstName(), user.getLastName(), encodedSalt));
+
+        return rowsInserted > 0;
+    }
+
+    @Override
+    public User getUser(String username) {
+        return userMapper.getUser(username);
     }
 
     private String generateRandomSalt() {
@@ -30,9 +42,6 @@ public class UserServiceImpl implements UserService {
         random.nextBytes(saltBytes);
         return new String(Base64.getEncoder().encode(saltBytes));
     }
-    @Override
-    public User getUser(String username){
-        return userMapper.getUser(username);
-    }
 }
+
 

@@ -12,24 +12,31 @@ import java.util.List;
 public class NoteServiceImpl implements NoteService {
     @Autowired
     NoteMapper noteMapper;
+
     @Override
     public int createNote(Note note) {
-        return noteMapper.insertNote(note);
+        return noteMapper.addNote(note);
     }
+
     @Override
     public int updateNote(Note note) {
         return noteMapper.updateNote(note);
     }
+
     @Override
     public int deleteNote(Integer noteId) {
         return noteMapper.deleteNote(noteId);
     }
+
     @Override
     public List<Note> getListNoteByUserId(Integer userId) {
         return noteMapper.getListNoteByUserId(userId);
     }
+
     @Override
     public Note getNoteById(Integer noteId) {
         return noteMapper.getNoteById(noteId);
     }
 }
+
+

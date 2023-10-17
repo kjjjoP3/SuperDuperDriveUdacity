@@ -15,24 +15,35 @@ public class FileServiceImpl implements FileService {
     FileMapper fileMapper;
 
     @Override
-    public int insertMultiFile(MultipartFile multipartFile, int userId) throws Exception{
-        File file = new File(multipartFile.getOriginalFilename(), multipartFile.getContentType(), String.valueOf(multipartFile.getSize()), userId, multipartFile.getBytes());
-        return fileMapper.createFile(file);
+    public int insertMultiFile(MultipartFile multipartFile, int userId) throws Exception {
+        File file = new File(
+                multipartFile.getOriginalFilename(),
+                multipartFile.getContentType(),
+                String.valueOf(multipartFile.getSize()),
+                userId,
+                multipartFile.getBytes()
+        );
+        return fileMapper.addFile(file);
     }
+
     @Override
-    public int deleteFile(int fileId){
+    public int deleteFile(int fileId) {
         return fileMapper.deleteFileById(fileId);
     }
+
     @Override
-    public List<File> getListFileByUserId(int userId){
+    public List<File> getListFileByUserId(int userId) {
         return fileMapper.getFileListByUserId(userId);
     }
+
     @Override
-    public boolean checkExistFileName(String fileName, int userId){
+    public boolean checkExistFileName(String fileName, int userId) {
         return fileMapper.checkExistFileName(fileName, userId) != null;
     }
+
     @Override
-    public File getFileById(int fileId){
+    public File getFileById(int fileId) {
         return fileMapper.getFileById(fileId);
     }
 }
+

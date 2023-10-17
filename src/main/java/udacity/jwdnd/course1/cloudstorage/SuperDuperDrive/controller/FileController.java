@@ -14,34 +14,38 @@ import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.Credential;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.File;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.model.Note;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.AuthenticationService;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.CredentialService;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.FileService;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.Iml.CredentialServiceImpl;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.Iml.FileServiceImpl;
 import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.Iml.NoteServiceImpl;
+import udacity.jwdnd.course1.cloudstorage.SuperDuperDrive.service.NoteService;
 
 import java.util.List;
 
 @Controller
 public class FileController {
-    @Autowired
-    FileServiceImpl fileservice;
 
     @Autowired
-    AuthenticationService authenticationservice;
+    FileService fileService;
 
     @Autowired
-    NoteServiceImpl noteservice;
+    NoteService noteService;
 
     @Autowired
-    CredentialServiceImpl credentialservice;
+    CredentialService credentialService;
+
+    @Autowired
+    AuthenticationService authenticationService;
 
     @PostMapping("/file/add")
     public String addMultiFile(@RequestParam("fileUpload") MultipartFile file, ModelMap model) throws Exception {
-        int userId = authenticationservice.getUserId();
+        int userId = authenticationService.getUserId();
 
-        if (fileservice.checkExistFileName(file.getOriginalFilename(), userId)) {
+        if (fileService.checkExistFileName(file.getOriginalFilename(), userId)) {
             model.addAttribute("error", "File name is already exists!");
         } else {
-            int result = fileservice.insertMultiFile(file, userId);
+            int result = fileService.insertMultiFile(file, userId);
             if (result == 1) {
                 model.addAttribute("message", "Upload file success!");
             } else {
@@ -54,9 +58,8 @@ public class FileController {
     }
 
     @GetMapping("/file/delete/{fileId}")
-    public String deleteMultiFile(@PathVariable String fileId, ModelMap model) {
-        int fileIdInt = Integer.parseInt(fileId);
-        int result = fileservice.deleteFile(fileIdInt);
+    public String deleteMultiFile(@PathVariable int fileId, ModelMap model) {
+        int result = fileService.deleteFile(fileId);
 
         if (result > 0) {
             model.addAttribute("message", "Delete file success!");
@@ -64,13 +67,13 @@ public class FileController {
             model.addAttribute("error", "Delete file fail!");
         }
 
-        loadAllFile(model, authenticationservice.getUserId());
+        loadAllFile(model, authenticationService.getUserId());
         return "home";
     }
 
     @GetMapping("/file/view/{fileId}")
     public ResponseEntity<byte[]> viewMultiFile(@PathVariable int fileId) {
-        File file = fileservice.getFileById(fileId);
+        File file = fileService.getFileById(fileId);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(file.getContentType()));
         headers.setContentDispositionFormData("attachment", file.getFileName());
@@ -79,13 +82,14 @@ public class FileController {
     }
 
     public void loadAllFile(ModelMap model, int userId) {
-        List<File> fileList = fileservice.getListFileByUserId(userId);
-        List<Note> noteList = noteservice.getListNoteByUserId(userId);
+        List<File> fileList = fileService.getListFileByUserId(userId);
+        List<Note> noteList = noteService.getListNoteByUserId(userId);
         Credential credential = new Credential();
         model.addAttribute("fileList", fileList);
         model.addAttribute("listNote", noteList);
         model.addAttribute("note", new Note());
-        model.addAttribute("listCredential", credentialservice.getCredentialsListByUserId(userId));
+        model.addAttribute("listCredential", credentialService.getCredentialsListByUserId(userId));
         model.addAttribute("credential", credential);
     }
 }
+

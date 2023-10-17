@@ -42,11 +42,6 @@ public class CredentialServiceImpl implements CredentialService {
         return credentialMapper.deleteCredentialById(credentialId);
     }
 
-    @Override
-    public Credential getCredentialById(int credentialId) {
-        return credentialMapper.getCredentialById(credentialId);
-    }
-
     private void setEncryptedValues(Credential credential) {
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];

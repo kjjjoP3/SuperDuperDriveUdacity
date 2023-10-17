@@ -131,19 +131,16 @@ public class NoteTest {
 
     public void editNote() throws InterruptedException {
         openNotesTab();
-        // Wait for the edit button to become clickable
         webDriverWait.until(ExpectedConditions.elementToBeClickable(By.id("editNoteBtn"))).click();
 
         WebElement noteTitle = driver.findElement(By.id("note-title"));
         WebElement noteDescription = driver.findElement(By.id("note-description"));
 
-        // Clear and edit the note fields
         noteTitle.clear();
         noteTitle.sendKeys(testNoteTitleEdit);
         noteDescription.clear();
         noteDescription.sendKeys(testNoteDescriptionEdit);
 
-        // Submit the form
         driver.findElement(By.id("noteSubmit")).submit();
     }
 

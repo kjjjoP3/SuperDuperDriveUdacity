@@ -9,5 +9,4 @@ public interface CredentialService {
     int insertCredential(Credential credential);
     int updateCredential(Credential credential);
     int deleteCredential(int credentialId);
-    Credential getCredentialById(int credentialId);
 }

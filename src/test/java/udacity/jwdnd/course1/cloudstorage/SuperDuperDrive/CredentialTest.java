@@ -40,35 +40,26 @@ class CredentialTest {
 
     @Test
     void testAddEditDeleteCredential() throws InterruptedException {
-        // Log in or sign up as needed
         loginOrSignUp();
         openCredentialsTab();
-
-
-
-        // Add a new credential
         openCredentialsTab();
         Thread.sleep(1000);
         addCredential("http://example.com", "username123", "password123");
         Thread.sleep(1000);
-        // Edit the added credential
         openCredentialsTab();
         Thread.sleep(1000);
         editCredential("http://example.com", "username123", "password123", "http://edited.com", "editedUser", "editedPass");
         Thread.sleep(1000);
-        // Delete the edited credential
         openCredentialsTab();
         Thread.sleep(1000);
         deleteCredential();
         Thread.sleep(1000);
-        // Confirm that the credential has been deleted
         webDriverWait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath("//th[text()='http://edited.com']")));
     }
 
     private void loginOrSignUp() {
         driver.get("http://localhost:" + port + "/signup");
         if (driver.getTitle().equals("Sign Up")) {
-            // You are on the sign-up page; perform sign-up
             WebElement firstNameField = driver.findElement(By.id("inputFirstName"));
             WebElement lastNameField = driver.findElement(By.id("inputLastName"));
             WebElement usernameField = driver.findElement(By.id("inputUsername"));
@@ -82,10 +73,8 @@ class CredentialTest {
             signUpButton.click();
         }
 
-        // Now, navigate to the login page
         driver.get("http://localhost:" + port + "/login");
 
-        // Log in with your credentials
         WebElement usernameField = driver.findElement(By.id("inputUsername"));
         WebElement passwordField = driver.findElement(By.id("inputPassword"));
         WebElement loginButton = driver.findElement(By.id("login-button"));

@@ -28,18 +28,15 @@ public class SignUpController {
     @PostMapping("/signup")
     public String register(@ModelAttribute User user, Model model, Principal principal) {
         if (principal != null) {
-            // Người dùng đã đăng nhập, chuyển họ đến trang chính.
             return "redirect:/home";
         }
 
         boolean registrationSuccessful = userService.registerUser(user);
 
         if (registrationSuccessful) {
-            // Đăng ký thành công, chuyển họ đến trang đăng nhập.
             model.addAttribute("signupSuccess", true);
             return "login";
         } else {
-            // Đăng ký thất bại, hiển thị thông báo lỗi.
             model.addAttribute("signupError", "Username is already taken.");
             return "signup";
         }

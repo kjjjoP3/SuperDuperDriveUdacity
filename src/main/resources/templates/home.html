@@ -29,7 +29,7 @@
             </div>
         </nav>
 
-        <div class="alert alert-success row col-12 ml-1" th:if="${message}" th:text="${message}"></div>
+        <div class="alert alert-success row col-12 ml-1" id="success" th:if="${message}" th:text="${message}"></div>
         <div class="alert alert-danger row col-12 ml-1" th:if="${error}" th:text="${error}"></div>
         <div class="tab-content" id="nav-tabContent">
             <div class="tab-pane fade show active" id="nav-files" role="tabpanel" aria-labelledby="nav-files-tab">
@@ -89,7 +89,7 @@
                             <td>
                                 <button type="button" class="btn btn-success" id="editNoteBtn"
                                         th:attr="onclick='showNoteModal(\'' + ${note.noteId} + '\',\'' + ${note.noteTitle} +'\',\''+ ${note.noteDescription} + '\')'">Edit</button>
-                                <a class="btn btn-danger"  th:href="@{'/note/delete/'+${note.noteId}}">Delete</a>
+                                <a class="btn btn-danger" id="deleteNoteButton"  th:href="@{'/note/delete/'+${note.noteId}}">Delete</a>
                             </td>
                             <th scope="row" th:text="${note.noteTitle}"></th>
                             <td th:text="${note.noteDescription}"></td>

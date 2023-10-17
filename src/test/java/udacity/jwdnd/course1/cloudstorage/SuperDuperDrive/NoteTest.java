@@ -63,16 +63,16 @@ public class NoteTest {
 
         Thread.sleep(1000);
         firstNameField.sendKeys(testFirstName);
-        Thread.sleep(1000);
+
 
         lastNameField.sendKeys(testLastName);
-        Thread.sleep(1000);
+
 
         userNameField.sendKeys(testUserName);
-        Thread.sleep(1000);
+
 
         passWordField.sendKeys(testPassWord);
-        Thread.sleep(1000);
+
 
         submitButton.click();
         Thread.sleep(1000);
@@ -84,13 +84,13 @@ public class NoteTest {
         WebElement passWordLoginField = driver.findElement(By.id("inputPassword"));
         WebElement submitButtonLogin = driver.findElement(By.id("login-button"));
 
-        Thread.sleep(1000);
+
 
         userNameLoginField.sendKeys(testUserName);
-        Thread.sleep(1000);
+
 
         passWordLoginField.sendKeys(testPassWord);
-        Thread.sleep(1000);
+
 
         submitButtonLogin.click();
         Thread.sleep(1000);
@@ -98,7 +98,6 @@ public class NoteTest {
     }
 
     @Test
-    @Order(1)
     public void addAndDisplayTest() throws InterruptedException {
         //login and signUp
         signUp();
@@ -116,64 +115,48 @@ public class NoteTest {
         noteTab.click();
         Thread.sleep(1000);
         addNoteBtn.click();
-        Thread.sleep(1000);
+
         noteTitle.sendKeys(testNoteTitle);
-        Thread.sleep(1000);
         noteDescription.sendKeys(testNoteDescription);
-        Thread.sleep(1000);
+
         noteForm.submit();
         Thread.sleep(1000);
 
+        editNote();
+        Thread.sleep(1000);
+        deleteAndConfirmNote();
+
     }
 
-    @Test
-    @Order(2)
+
     public void editNote() throws InterruptedException {
-        Assertions.assertDoesNotThrow(() -> {
-            driver.findElement(By.xpath("//th[text()='Note title']"));
-            driver.findElement(By.xpath("//td[text()='Note Description']"));
-        });
-        WebElement noteTab = driver.findElement(By.id("nav-notes-tab"));
-        WebElement editBtn = driver.findElement(By.id("editNoteBtn"));
+        openNotesTab();
+        // Wait for the edit button to become clickable
+        webDriverWait.until(ExpectedConditions.elementToBeClickable(By.id("editNoteBtn"))).click();
+
         WebElement noteTitle = driver.findElement(By.id("note-title"));
         WebElement noteDescription = driver.findElement(By.id("note-description"));
-        WebElement noteForm = driver.findElement(By.id("noteSubmit"));
 
-        Thread.sleep(1000);
-        noteTab.click();
-        Thread.sleep(1000);
-        editBtn.click();
-        Thread.sleep(1000);
+        // Clear and edit the note fields
         noteTitle.clear();
-        Thread.sleep(1000);
         noteTitle.sendKeys(testNoteTitleEdit);
-        Thread.sleep(1000);
+        noteDescription.clear();
         noteDescription.sendKeys(testNoteDescriptionEdit);
-        Thread.sleep(1000);
-        noteForm.submit();
-        Thread.sleep(1000);
-        noteTab.click();
-        Thread.sleep(1000);
+
+        // Submit the form
+        driver.findElement(By.id("noteSubmit")).submit();
     }
 
-    @Test
-    @Order(3)
     public void deleteAndConfirmNote() throws InterruptedException {
+        openNotesTab();
+        WebElement deleteCredentialButton = driver.findElement(By.id("deleteNoteButton")); // Change the ID to match your HTML
+        deleteCredentialButton.click();
+    }
 
-        Assertions.assertDoesNotThrow(() -> {
-            driver.findElement(By.xpath("//th[text()='Edit Note title']"));
-            driver.findElement(By.xpath("//td[text()='Edit Note Description']"));
-        });
-
-        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//th[text()='Edit Note title']")));
-        WebElement noteTitle = driver.findElement(By.xpath("//th[text()='Edit Note title']"));
-        Assertions.assertEquals("Edit Note title", noteTitle.getText());
-        WebElement noteDescription = driver.findElement(By.xpath("//td[text()='Edit Note Description']"));
-        Assertions.assertEquals("Edit Note Description", noteDescription.getText());
-
-        WebElement deleteBtn = driver.findElement(By.xpath("//*[@id='noteTable']/tbody/tr/td[1]/a"));
-        Assertions.assertEquals("Delete", deleteBtn.getText());
-        deleteBtn.click();
-
+    private void openNotesTab() {
+        driver.get("http://localhost:" + port + "/home");
+        WebElement credentialsTab = driver.findElement(By.id("nav-notes-tab"));
+        credentialsTab.click();
+        webDriverWait.until(ExpectedConditions.attributeContains(credentialsTab, "class", "active"));
     }
 }

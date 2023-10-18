@@ -14,16 +14,29 @@ public class FileServiceImpl implements FileService {
     @Autowired
     FileMapper fileMapper;
 
+    private static final long MAX_FILE_SIZE = 10 * 1024 * 1024;
+
     @Override
-    public int insertMultiFile(MultipartFile multipartFile, int userId) throws Exception {
-        File file = new File(
-                multipartFile.getOriginalFilename(),
-                multipartFile.getContentType(),
-                String.valueOf(multipartFile.getSize()),
-                userId,
-                multipartFile.getBytes()
-        );
-        return fileMapper.addFile(file);
+    public int insertMultiFile(MultipartFile multipartFile, int userId) {
+        long fileSize = multipartFile.getSize();
+        if (fileSize > MAX_FILE_SIZE) {
+            return 0;
+        }
+
+        try {
+            File file = new File(
+                    multipartFile.getOriginalFilename(),
+                    multipartFile.getContentType(),
+                    String.valueOf(fileSize),
+                    userId,
+                    multipartFile.getBytes()
+            );
+
+            int result = fileMapper.addFile(file);
+            return result;
+        } catch (Exception e) {
+            return -1;
+        }
     }
 
     @Override

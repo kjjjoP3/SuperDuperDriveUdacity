@@ -48,6 +48,7 @@
                         </div>
                     </div>
                 </form>
+                <div id="errorDiv"></div>
                 <div class="table-responsive">
                     <table class="table table-striped" id="fileTable">
                         <thead>
@@ -232,6 +233,26 @@
         $('#credential-password').val(password ? password : '');
         $('#credentialModal').modal('show');
     }
+</script>
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileUploadForm = document.getElementById('fileUploadForm');
+        const fileUploadInput = document.getElementById('fileUpload');
+        const errorDiv = document.getElementById('errorDiv');
+        const maxFileSize = 10485760;
+
+        fileUploadForm.addEventListener('submit', function(event) {
+            const file = fileUploadInput.files[0];
+            if (file) {
+                if (file.size > maxFileSize) {
+                    errorDiv.textContent = 'File size exceeds the allowed limit.';
+                    event.preventDefault();
+                } else {
+                    errorDiv.textContent = '';
+                }
+            }
+        });
+    });
 </script>
 </body>
 
